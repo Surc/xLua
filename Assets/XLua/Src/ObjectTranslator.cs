@@ -132,7 +132,9 @@ namespace XLua
             interfaceBridgeCreators.Add(type, creator);
         }
 
+        //这个函数也可能被lua调用，所以再加一层类型缓存，防止同一类型被多次调用。
         Dictionary<Type, bool> loaded_types = new Dictionary<Type, bool>();
+        //构造类型元表
         public bool TryDelayWrapLoader(RealStatePtr L, Type type)
         {
             if (loaded_types.ContainsKey(type)) return true;
@@ -141,16 +143,20 @@ namespace XLua
             LuaAPI.luaL_newmetatable(L, type.FullName); //先建一个metatable，因为加载过程可能会需要用到
             LuaAPI.lua_pop(L, 1);
 
+            //这个loader就是wrap中的_Regster方法，用来生成这种类型的元表
             Action<RealStatePtr> loader;
             int top = LuaAPI.lua_gettop(L);
+            //首先检索是否有用户预定义的元表生成器
             if (delayWrap.TryGetValue(type, out loader))
             {
                 delayWrap.Remove(type);
+                //构造元表
                 loader(L);
             }
             else
             {
 #if !GEN_CODE_MINIMIZE && !ENABLE_IL2CPP && (UNITY_EDITOR || XLUA_GENERAL) && !FORCE_REFLECTION && !NET_STANDARD_2_0
+//如果内嵌了代码生成器，则动态生成这个类型的Warp，并使用动态生成的warp来生成元表
                 if (!DelegateBridge.Gen_Flag && !type.IsEnum() && !typeof(Delegate).IsAssignableFrom(type) && Utils.IsPublic(type))
                 {
                     Type wrap = ce.EmitTypeWrap(type);
@@ -162,6 +168,7 @@ namespace XLua
                     Utils.ReflectionWrap(L, type, privateAccessibleFlags.Contains(type));
                 }
 #else
+                //否则的话使用反射
                 Utils.ReflectionWrap(L, type, privateAccessibleFlags.Contains(type));
 #endif
 #if NOT_GEN_WARNING
@@ -230,6 +237,7 @@ namespace XLua
 #if (UNITY_WSA && !ENABLE_IL2CPP) && !UNITY_EDITOR
             var assemblies_usorted = Utils.GetAssemblies();
 #else
+           
             assemblies.Add(Assembly.GetExecutingAssembly());
             var assemblies_usorted = AppDomain.CurrentDomain.GetAssemblies();
 #endif
@@ -244,16 +252,26 @@ namespace XLua
                 }
             }
 
+            // 保存虚拟机环境
             this.luaEnv=luaenv;
+
+            // 创建绑定 数据转换的函数
             objectCasters = new ObjectCasters(this);
+            // 数据检测
             objectCheckers = new ObjectCheckers(this);
+            // ??? 类的构造, 方法,执行回调的缓存 ??
             methodWrapsCache = new MethodWrapsCache(this, objectCheckers, objectCasters);
+
+            // meta静态回调
 			metaFunctions=new StaticLuaCallbacks();
 
+            // ???
             importTypeFunction = new LuaCSFunction(StaticLuaCallbacks.ImportType);
             loadAssemblyFunction = new LuaCSFunction(StaticLuaCallbacks.LoadAssembly);
             castFunction = new LuaCSFunction(StaticLuaCallbacks.Cast);
 
+            // lua中C#的缓存表 v设置为弱值
+            // lua gc检测发现C#的类已经无引用,释放, 触发_gc方法调用C#中gc函数,进行释放
             LuaAPI.lua_newtable(L);
             LuaAPI.lua_newtable(L);
             LuaAPI.xlua_pushasciistring(L, "__mode");
@@ -671,6 +689,7 @@ namespace XLua
 
         public void OpenLib(RealStatePtr L)
 		{
+            // 创建xlua方法
             if (0 != LuaAPI.xlua_getglobal(L, "xlua"))
             {
                 throw new Exception("call xlua_getglobal fail!" + LuaAPI.lua_tostring(L, -1));
@@ -1024,6 +1043,7 @@ namespace XLua
 
         internal int getTypeId(RealStatePtr L, Type type, out bool is_first, LOGLEVEL log_level = LOGLEVEL.WARN)
         {
+            //尝试获取c#中检索
             int type_id;
             is_first = false;
             if (!typeIdMap.TryGetValue(type, out type_id)) // no reference
@@ -1043,12 +1063,14 @@ namespace XLua
                 is_first = true;
                 Type alias_type = null;
                 aliasCfg.TryGetValue(type, out alias_type);
+
+                //尝试从lua中检索
                 LuaAPI.luaL_getmetatable(L, alias_type == null ? type.FullName : alias_type.FullName);
 
                 if (LuaAPI.lua_isnil(L, -1)) //no meta yet, try to use reflection meta
                 {
                     LuaAPI.lua_pop(L, 1);
-
+                    //获取类型的元表
                     if (TryDelayWrapLoader(L, alias_type == null ? type : alias_type))
                     {
                         LuaAPI.luaL_getmetatable(L, alias_type == null ? type.FullName : alias_type.FullName);
@@ -1068,6 +1090,7 @@ namespace XLua
                 {
                     if (type.IsEnum())
                     {
+                        // 绑定 枚举 相关操作
                         LuaAPI.xlua_pushasciistring(L, "__band");
                         LuaAPI.lua_pushstdcallcfunction(L, metaFunctions.EnumAndMeta);
                         LuaAPI.lua_rawset(L, -3);
@@ -1077,11 +1100,13 @@ namespace XLua
                     }
                     if (typeof(IEnumerable).IsAssignableFrom(type))
                     {
+                        // 绑定 IEnumerable 相关操作 ??
                         LuaAPI.xlua_pushasciistring(L, "__pairs");
                         LuaAPI.lua_getref(L, enumerable_pairs_func);
                         LuaAPI.lua_rawset(L, -3);
                     }
                     LuaAPI.lua_pushvalue(L, -1);
+                    //生成新的type_id
                     type_id = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
                     LuaAPI.lua_pushnumber(L, type_id);
                     LuaAPI.xlua_rawseti(L, -2, 1);
@@ -1337,6 +1362,7 @@ namespace XLua
             {
                 if (LuaAPI.lua_type(L, index) != LuaTypes.LUA_TUSERDATA) return null;
 
+                // 浮点数???
                 Type type = GetTypeOf(L, index);
                 if (type == typeof(decimal))
                 {

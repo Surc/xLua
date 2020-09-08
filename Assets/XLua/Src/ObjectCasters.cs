@@ -32,6 +32,10 @@ namespace XLua
         Dictionary<Type, ObjectCheck> checkersMap = new Dictionary<Type, ObjectCheck>();
         ObjectTranslator translator;
 
+        /// <summary>
+        /// 数据类型检测
+        /// </summary>
+        /// <param name="translator"></param>
         public ObjectCheckers(ObjectTranslator translator)
         {
             this.translator = translator;
@@ -212,6 +216,9 @@ namespace XLua
 
     public class ObjectCasters
     {
+        /// <summary>
+        /// C#-&gt;lua 类型映射
+        /// </summary>
         Dictionary<Type, ObjectCast> castersMap = new Dictionary<Type, ObjectCast>();
         ObjectTranslator translator;
 
@@ -712,6 +719,11 @@ namespace XLua
             };
         }
 
+        /// <summary>
+        /// 根据类型获取值 (转化类型)
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public ObjectCast GetCaster(Type type)
         {
             if (type.IsByRef) type = type.GetElementType();
@@ -724,6 +736,7 @@ namespace XLua
             ObjectCast oc;
             if (!castersMap.TryGetValue(type, out oc))
             {
+                // 动态生成类型
                 oc = genCaster(type);
                 castersMap.Add(type, oc);
             }

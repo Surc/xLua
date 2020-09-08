@@ -21,6 +21,23 @@ namespace XLuaTest
         public GameObject value;
     }
 
+    [GCOptimize]
+    public struct PushAsUStruct
+    {
+        public int x;
+        public int y;
+        public float f;
+    }
+
+    [GCOptimize(OptimizeFlag.PackAsTable)]
+    public struct PushAsTStruct
+    {
+        public int x;
+        public int y;
+        public float f;
+    }
+
+
     [LuaCallCSharp]
     public class LuaBehaviour : MonoBehaviour
     {
@@ -64,6 +81,8 @@ namespace XLuaTest
             {
                 luaAwake();
             }
+
+
         }
 
         // Use this for initialization

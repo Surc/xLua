@@ -8,6 +8,8 @@
 
 using UnityEngine;
 using XLua;
+using XLua.LuaDLL;
+using LuaAPI = XLua.LuaDLL.Lua;
 
 namespace XLuaTest
 {
@@ -17,13 +19,34 @@ namespace XLuaTest
         void Start()
         {
             LuaEnv luaenv = new LuaEnv();
-            luaenv.DoString("CS.UnityEngine.Debug.Log('hello world')");
+            luaenv.DoString("local util = require 'xlua.util'; CS.UnityEngine.Debug.Log('hello world')");
             luaenv.Dispose();
+
+            Test();
         }
 
         // Update is called once per frame
         void Update()
         {
+
+        }
+
+        void Test()
+        {
+           var L =  LuaAPI.luaL_newstate();
+           for (int i = 1; i <= 5; i++)
+           {
+               LuaAPI.lua_pushnumber(L, i);
+           }
+
+           Debug.Log("Stack is : ");
+
+           LuaAPI.lua_insert(L, 3);
+
+           for (int i = 1; i <= LuaAPI.lua_gettop(L); i++)
+           {
+               Debug.Log(LuaAPI.lua_tonumber(L, i) + ";");
+           }
 
         }
     }

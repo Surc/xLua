@@ -12,6 +12,7 @@ namespace XLuaTest
         public int y;
     }
 
+
     public class ReImplementInLua : MonoBehaviour
     {
 

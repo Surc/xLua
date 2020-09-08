@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "LuaPanda",
+            "cwd": "${workspaceFolder}",
+            "luaFileExtension": "lua.txt",
+            "connectionPort": 8818,
+            "pathCaseSensitivity": true,
+            "stopOnEntry": true,
+            "useCHook": true,
+            "autoPathMode": true,
+            "logLevel": 1,
+            "updateTips": true
+        },
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "LuaPanda-DebugFile",
+            "luaPath": "",
+            "packagePath": [],
+            "luaFileExtension": "",
+            "connectionPort": 8818,
+            "stopOnEntry": true,
+            "useCHook": true,
+            "logLevel": 1
+        }
+    ]
+}

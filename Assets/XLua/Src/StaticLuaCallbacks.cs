@@ -32,6 +32,7 @@ namespace XLua
 
         public StaticLuaCallbacks()
         {
+            // 静态回调函数 用于元表操作
             GcMeta = new LuaCSFunction(StaticLuaCallbacks.LuaGC);
             ToStringMeta = new LuaCSFunction(StaticLuaCallbacks.ToString);
             EnumAndMeta = new LuaCSFunction(EnumAnd);

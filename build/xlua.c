@@ -112,7 +112,7 @@ LUA_API int lua_setfenv(lua_State *L, int idx)
 }
 
 LUA_API uint32_t xlua_objlen (lua_State *L, int idx) {
-	return (uint32_t)lua_rawlen (L, idx);
+	return (uint32_t)luaL_len (L, idx);
 }
 
 LUA_API uint32_t xlua_touint (lua_State *L, int idx) {
@@ -210,6 +210,7 @@ static int c_lua_gettable(lua_State* L) {
     lua_gettable(L, 1);    
     return 1;
 }
+
 
 LUA_API int xlua_pgettable(lua_State* L, int idx) {
     int top = lua_gettop(L);
@@ -347,6 +348,7 @@ LUA_API int xlua_tryget_cachedud(lua_State *L, int key, int cache_ref) {
 	return 0;
 }
 
+// 将栈顶的object放入缓存表中
 static void cacheud(lua_State *L, int key, int cache_ref) {
 	lua_rawgeti(L, LUA_REGISTRYINDEX, cache_ref);
 	lua_pushvalue(L, -2);
@@ -355,14 +357,22 @@ static void cacheud(lua_State *L, int key, int cache_ref) {
 }
 
 
+/*
+key：传递的对象
+meta_ref：对象所属类型的元表的索引
+need_cache：此对象是否需要在lua缓存
+cache_ref：缓存表的伪索引
+*/
 LUA_API void xlua_pushcsobj(lua_State *L, int key, int meta_ref, int need_cache, int cache_ref) {
 	int* pointer = (int*)lua_newuserdata(L, sizeof(int));
 	*pointer = key;
 	
+	//R.cache_ref[Key] = pointer 将object放入缓存表中
 	if (need_cache) cacheud(L, key, cache_ref);
 
     lua_rawgeti(L, LUA_REGISTRYINDEX, meta_ref);
 
+	// 将R[meta_ref]上的表数据设作为元表设置给object
 	lua_setmetatable(L, -2);
 }
 
@@ -733,6 +743,8 @@ static int profiler_set_hook(lua_State *L) {
 	return 0;
 }
 
+
+//封装一层闭包函数,增加错误错误处理捕获和钩子处理
 static int csharp_function_wrap(lua_State *L) {
 	lua_CFunction fn = (lua_CFunction)lua_tocfunction(L, lua_upvalueindex(1));
     int ret = fn(L);    
@@ -751,6 +763,8 @@ static int csharp_function_wrap(lua_State *L) {
     return ret;
 }
 
+// 压入C#的函数
+//封装一层闭包函数,增加错误错误处理捕获和钩子处理
 LUA_API void xlua_push_csharp_function(lua_State* L, lua_CFunction fn, int n)
 { 
     lua_pushcfunction(L, fn);

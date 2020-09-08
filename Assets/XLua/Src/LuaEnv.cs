@@ -86,9 +86,12 @@ namespace XLua
 
                 translator = new ObjectTranslator(this, rawL);
                 translator.createFunctionMetatable(rawL);
+
                 translator.OpenLib(rawL);
+
                 ObjectTranslatorPool.Instance.Add(rawL, translator);
 
+              
                 LuaAPI.lua_atpanic(rawL, StaticLuaCallbacks.Panic);
 
 #if !XLUA_GENERAL
@@ -102,6 +105,7 @@ namespace XLua
                 //template engine lib register
                 TemplateEngine.LuaTemplate.OpenLib(rawL);
 
+                // 添加自定义加载
                 AddSearcher(StaticLuaCallbacks.LoadBuiltinLib, 2); // just after the preload searcher
                 AddSearcher(StaticLuaCallbacks.LoadFromCustomLoaders, 3);
 #if !XLUA_GENERAL
@@ -112,17 +116,22 @@ namespace XLua
                 init_xlua = null;
 
 #if (!UNITY_SWITCH && !UNITY_WEBGL) || UNITY_EDITOR
+                // 添加socket库
                 AddBuildin("socket.core", StaticLuaCallbacks.LoadSocketCore);
                 AddBuildin("socket", StaticLuaCallbacks.LoadSocketCore);
 #endif
-
+                // 压栈registry[xlua_csharp_namespace]
                 AddBuildin("CS", StaticLuaCallbacks.LoadCS);
 
+                // 注册表全局索引
+                // 后续method会存放到此
                 LuaAPI.lua_newtable(rawL); //metatable of indexs and newindexs functions
                 LuaAPI.xlua_pushasciistring(rawL, "__index");
                 LuaAPI.lua_pushstdcallcfunction(rawL, StaticLuaCallbacks.MetaFuncIndex);
                 LuaAPI.lua_rawset(rawL, -3);
 
+               
+                // 后续生成的index newIndex都会通过类名索引到相关方法
                 LuaAPI.xlua_pushasciistring(rawL, Utils.LuaIndexsFieldName);
                 LuaAPI.lua_newtable(rawL);
                 LuaAPI.lua_pushvalue(rawL, -3);
@@ -149,6 +158,7 @@ namespace XLua
 
                 LuaAPI.lua_pop(rawL, 1); // pop metatable of indexs and newindexs functions
 
+                // 备注当前线程
                 LuaAPI.xlua_pushasciistring(rawL, MAIN_SHREAD);
                 LuaAPI.lua_pushthread(rawL);
                 LuaAPI.lua_rawset(rawL, LuaIndexes.LUA_REGISTRYINDEX);
@@ -161,6 +171,7 @@ namespace XLua
                 LuaAPI.lua_rawset(rawL, LuaIndexes.LUA_REGISTRYINDEX);
 
 #if !XLUA_GENERAL && (!UNITY_WSA || UNITY_EDITOR)
+                // ???
                 translator.Alias(typeof(Type), "System.MonoType");
 #endif
 
@@ -181,8 +192,12 @@ namespace XLua
                     }
                 }
 
+                // 注册表中创建以下metatable数据
+                // 创建Array函数元表
                 translator.CreateArrayMetatable(rawL);
+                // 创建delegate元表??
                 translator.CreateDelegateMetatable(rawL);
+                // 存放枚举数据
                 translator.CreateEnumerablePairs(rawL);
             }
         }
@@ -297,17 +312,21 @@ namespace XLua
                 var _L = L;
                 //insert the loader
                 LuaAPI.xlua_getloaders(_L);
+                // package.searchers
                 if (!LuaAPI.lua_istable(_L, -1))
                 {
                     throw new Exception("Can not set searcher!");
                 }
                 uint len = LuaAPI.xlua_objlen(_L, -1);
                 index = index < 0 ? (int)(len + index + 2) : index;
+                // 此处将数据插入到table中的index位置,table扩大1个单位,其它元素平移
                 for (int e = (int)len + 1; e > index; e--)
                 {
                     LuaAPI.xlua_rawgeti(_L, -1, e - 1);
                     LuaAPI.xlua_rawseti(_L, -2, e);
                 }
+
+                // 将searcher函数设置到package下loader/package 中index位置
                 LuaAPI.lua_pushstdcallcfunction(_L, searcher);
                 LuaAPI.xlua_rawseti(_L, -2, index);
                 LuaAPI.lua_pop(_L, 1);

@@ -6,6 +6,7 @@
 
 local util = require 'xlua.util'
 local message_box = require 'message_box'
+require("LuaPanda").start("127.0.0.1",8818)
 
 -------------------------async_recharge-----------------------------
 local function async_recharge(num, cb) --模拟的异步充值
@@ -14,6 +15,11 @@ local function async_recharge(num, cb) --模拟的异步充值
 end
 
 local recharge = util.async_to_sync(async_recharge)
+
+local testfunc1 = function()
+	CS.UnityEngine.Debug.Log("Tst~~~~~~~~~~");
+	print('testfunc1 finished')
+end
 -------------------------async_recharge end----------------------------
 local buy = function()
     message_box.alert("您余额不足，请充值！", "余额提醒")
@@ -25,8 +31,11 @@ local buy = function()
 	    print('cancel')
 	    message_box.alert("取消充值！", "提示")
 	end
+
+	testfunc1();
 	print('recharge finished')
 end
+
 --将按钮监听点击事件，绑定buy方法
 CS.UnityEngine.GameObject.Find("Button"):GetComponent("Button").onClick:AddListener(util.coroutine_call(buy))
 
