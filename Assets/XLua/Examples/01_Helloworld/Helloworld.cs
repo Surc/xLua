@@ -13,16 +13,20 @@ using LuaAPI = XLua.LuaDLL.Lua;
 
 namespace XLuaTest
 {
+
     public class Helloworld : MonoBehaviour
     {
         // Use this for initialization
         void Start()
         {
             LuaEnv luaenv = new LuaEnv();
-            luaenv.DoString("local util = require 'xlua.util'; CS.UnityEngine.Debug.Log('hello world')");
+            //luaenv.DoString(" CS.UnityEngine.Debug.Log('hello world')");
+            luaenv.DoString("local dataV = CS.UnityEngine.Vector3(5,6,7); local dataV = CS.UnityEngine.Vector3(1,2,3)");
+         
+            //luaenv.DoString("local dataV = CS.UnityEngine.Vector3(5,6,7); dataV:Normalize();CS.UnityEngine.Debug.Log('hello world')");
             luaenv.Dispose();
 
-            Test();
+            //Test();
         }
 
         // Update is called once per frame

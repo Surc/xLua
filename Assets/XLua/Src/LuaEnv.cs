@@ -125,13 +125,14 @@ namespace XLua
 
                 // 注册表全局索引
                 // 后续method会存放到此
-                LuaAPI.lua_newtable(rawL); //metatable of indexs and newindexs functions
+                LuaAPI.lua_newtable(rawL); //metatable of indexs and newindexs functions 
+
                 LuaAPI.xlua_pushasciistring(rawL, "__index");
                 LuaAPI.lua_pushstdcallcfunction(rawL, StaticLuaCallbacks.MetaFuncIndex);
                 LuaAPI.lua_rawset(rawL, -3);
 
                
-                // 后续生成的index newIndex都会通过类名索引到相关方法
+                //所有对象 的_index newIndex都会通过类名索引到相关方法
                 LuaAPI.xlua_pushasciistring(rawL, Utils.LuaIndexsFieldName);
                 LuaAPI.lua_newtable(rawL);
                 LuaAPI.lua_pushvalue(rawL, -3);
@@ -144,6 +145,7 @@ namespace XLua
                 LuaAPI.lua_setmetatable(rawL, -2);
                 LuaAPI.lua_rawset(rawL, LuaIndexes.LUA_REGISTRYINDEX);
 
+                //所有静态的_index newIndex都会通过类名索引到相关方法
                 LuaAPI.xlua_pushasciistring(rawL, Utils.LuaClassIndexsFieldName);
                 LuaAPI.lua_newtable(rawL);
                 LuaAPI.lua_pushvalue(rawL, -3);
@@ -171,7 +173,7 @@ namespace XLua
                 LuaAPI.lua_rawset(rawL, LuaIndexes.LUA_REGISTRYINDEX);
 
 #if !XLUA_GENERAL && (!UNITY_WSA || UNITY_EDITOR)
-                // ???
+                // 类型别名设置
                 translator.Alias(typeof(Type), "System.MonoType");
 #endif
 
@@ -488,13 +490,16 @@ namespace XLua
             local load_assembly = xlua.load_assembly
 
             function metatable:__index(key) 
+                --查询自己Key为'.fqn'的值,并且不触发__index元方法
                 local fqn = rawget(self,'.fqn')
+                --尝试查询CS类型
                 fqn = ((fqn and fqn .. '.') or '') .. key
-
+                print('use import_type'..fqn)
                 local obj = import_type(fqn)
 
                 if obj == nil then
                     -- It might be an assembly, so we load it too.
+                    --如果为空,有可能这个字段还是类名的一部分,那么创建一个table记录,然后缓存返回.    
                     obj = { ['.fqn'] = fqn }
                     setmetatable(obj, metatable)
                 elseif obj == true then
@@ -511,7 +516,10 @@ namespace XLua
             end
 
             -- A non-type has been called; e.g. foo = System.Foo()
+            -- 绑定构造函数
             function metatable:__call(...)
+                -- 返回参数个数
+                print('use contruct')
                 local n = select('#', ...)
                 local fqn = rawget(self,'.fqn')
                 if n > 0 then

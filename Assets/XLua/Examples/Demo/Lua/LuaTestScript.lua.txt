@@ -1,0 +1,42 @@
+
+--require 'CS.UnityEngine.Vector3'
+
+local speed = 10
+local lightCpnt = nil
+
+
+local dataAsU = nil;
+local dataAsT = nil;
+local dataV3 = nil;
+
+--local dataV = CS.UnityEngine.Vector3(5,6,7);
+--dataV:Normalize();
+
+local Dictionary_String_Vector3 = CS.System.Collections.Generic.Dictionary(CS.System.String, CS.UnityEngine.Vector3)
+local dic = Dictionary_String_Vector3()
+dic:Add('a', CS.UnityEngine.Vector3(1, 2, 3))
+print(dic:TryGetValue('a'))
+
+--local dataV1 = CS.UnityEngine.Vector3(1,2,3);
+
+function start()
+	print("lua start...")
+	print("injected object", lightObject)
+	lightCpnt= lightObject:GetComponent(typeof(CS.UnityEngine.Light))
+end
+
+function update()
+	--local r = CS.UnityEngine.Vector3.up * CS.UnityEngine.Time.deltaTime * speed
+	--self.transform:Rotate(r)
+	--lightCpnt.color = CS.UnityEngine.Color(CS.UnityEngine.Mathf.Sin(CS.UnityEngine.Time.time) / 2 + 0.5, 0, 0, 1)
+	--lightCpnt.color = {r=1, g=1, b=1, a=1};
+	--dataAsU = CS.XLuaTest.PushAsUStruct(1,2, 333.33);
+	--dataAsU = CS.XLuaTest.PushAsUStruct(1,2, 333.33);
+	--dataV3 = CS.UnityEngine.Vector3(5,6, 7);
+	--dataV3 = CS.XLuaTest.PushAsClass('test', 1);
+end
+
+function ondestroy()
+    print("lua destroy")
+end
+

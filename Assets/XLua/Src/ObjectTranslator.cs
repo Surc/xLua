@@ -259,15 +259,18 @@ namespace XLua
             objectCasters = new ObjectCasters(this);
             // 数据检测
             objectCheckers = new ObjectCheckers(this);
-            // ??? 类的构造, 方法,执行回调的缓存 ??
+            // 反射类的构造, 方法,执行回调的缓存
             methodWrapsCache = new MethodWrapsCache(this, objectCheckers, objectCasters);
 
             // meta静态回调
-			metaFunctions=new StaticLuaCallbacks();
+			metaFunctions= new StaticLuaCallbacks();
 
-            // ???
+            // 静态回调
+            // Lua import_type 对C#类进行索引
             importTypeFunction = new LuaCSFunction(StaticLuaCallbacks.ImportType);
+            // lua 热更使用
             loadAssemblyFunction = new LuaCSFunction(StaticLuaCallbacks.LoadAssembly);
+
             castFunction = new LuaCSFunction(StaticLuaCallbacks.Cast);
 
             // lua中C#的缓存表 v设置为弱值
@@ -734,10 +737,12 @@ namespace XLua
 		
 		internal void createFunctionMetatable(RealStatePtr L)
 		{
+            // 生成gc回调函数
 			LuaAPI.lua_newtable(L);
 			LuaAPI.xlua_pushasciistring(L,"__gc");
 			LuaAPI.lua_pushstdcallcfunction(L,metaFunctions.GcMeta);
 			LuaAPI.lua_rawset(L,-3);
+            // 设置xlua tag 标识 1
             LuaAPI.lua_pushlightuserdata(L, LuaAPI.xlua_tag());
             LuaAPI.lua_pushnumber(L, 1);
             LuaAPI.lua_rawset(L, -3);
@@ -1016,6 +1021,7 @@ namespace XLua
             }
         }
 
+        // 类型对应 lua注册表中下标
         Dictionary<Type, int> typeIdMap = new Dictionary<Type, int>();
 
         //only store the type id to type map for struct
@@ -1061,6 +1067,7 @@ namespace XLua
                 }
 
                 is_first = true;
+                // 类别名
                 Type alias_type = null;
                 aliasCfg.TryGetValue(type, out alias_type);
 
@@ -1081,7 +1088,7 @@ namespace XLua
                     }
                 }
 
-                //循环依赖，自身依赖自己的class，比如有个自身类型的静态readonly对象。
+                // ??? 循环依赖，自身依赖自己的class，比如有个自身类型的静态readonly对象。
                 if (typeIdMap.TryGetValue(type, out type_id))
                 {
                     LuaAPI.lua_pop(L, 1);

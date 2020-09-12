@@ -1046,6 +1046,18 @@ namespace XLua
         public static void EndObjectRegister(Type type, RealStatePtr L, ObjectTranslator translator, CSharpWrapper csIndexer,
             CSharpWrapper csNewIndexer, Type base_type, CSharpWrapper arrayIndexer, CSharpWrapper arrayNewIndexer)
 #else
+		/// <summary>
+		/// 类对象注册完成;
+		/// 主要是 设置List相关方法,以及 对父子类的的一个关联
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="L"></param>
+		/// <param name="translator"></param>
+		/// <param name="csIndexer"></param>
+		/// <param name="csNewIndexer"></param>
+		/// <param name="base_type"></param>
+		/// <param name="arrayIndexer"></param>
+		/// <param name="arrayNewIndexer"></param>
 		public static void EndObjectRegister(Type type, RealStatePtr L, ObjectTranslator translator, LuaCSFunction csIndexer,
 			LuaCSFunction csNewIndexer, Type base_type, LuaCSFunction arrayIndexer, LuaCSFunction arrayNewIndexer)
 #endif
@@ -1076,8 +1088,10 @@ namespace XLua
 
 			translator.Push(L, type == null ? base_type : type.BaseType());
 
+			// 获取当前类的index方法
 			LuaAPI.xlua_pushasciistring(L, LuaIndexsFieldName);
 			LuaAPI.lua_rawget(L, LuaIndexes.LUA_REGISTRYINDEX);
+
 			if (arrayIndexer == null)
 			{
 				LuaAPI.lua_pushnil(L);
@@ -1090,9 +1104,11 @@ namespace XLua
 				LuaAPI.lua_pushstdcallcfunction(L, arrayIndexer);
 #endif
 			}
-
+            //跟类中一样，也是生成闭包方法，弹出上面的6个值，还有一个是nil在C中压入的跟类中一样
+			//父子类关联设置(_index)
 			LuaAPI.gen_obj_indexer(L);
 
+			// registry["LuaIndexs"][type.FullName] = index
 			if (type != null)
 			{
 				LuaAPI.xlua_pushasciistring(L, LuaIndexsFieldName);
@@ -1103,6 +1119,7 @@ namespace XLua
 				LuaAPI.lua_pop(L, 1);
 			}
 
+            //obj_meta[__index] = gen_obj_index
 			LuaAPI.lua_rawset(L, meta_idx);
 			//end index gen
 
@@ -1141,8 +1158,10 @@ namespace XLua
 #endif
 			}
 
+			//子类和父类搜索(_newindex)
 			LuaAPI.gen_obj_newindexer(L);
 
+            // registry["LuaNewIndexs"][type.FullName] = newindex
 			if (type != null)
 			{
 				LuaAPI.xlua_pushasciistring(L, LuaNewIndexsFieldName);
@@ -1374,6 +1393,7 @@ namespace XLua
 				}
 				if (LuaAPI.lua_isnil(L, -1))
 				{
+					// 补充前置路径
 					LuaAPI.lua_pop(L, 1);
 					LuaAPI.lua_createtable(L, 0, 0);
 					LuaAPI.xlua_pushasciistring(L, path[i]);

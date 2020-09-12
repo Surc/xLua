@@ -400,6 +400,7 @@ void print_value(lua_State *L,  char *str, int idx) {
 //param   --- [1]: obj, [2]: key
 LUA_API int obj_indexer(lua_State *L) {	
 	if (!lua_isnil(L, lua_upvalueindex(1))) {
+		// key压栈
 		lua_pushvalue(L, 2);
 		lua_gettable(L, lua_upvalueindex(1));
 		if (!lua_isnil(L, -1)) {//has method
@@ -474,6 +475,7 @@ LUA_API int gen_obj_indexer(lua_State *L) {
 	lua_pushcclosure(L, obj_indexer, 7);
 	return 0;
 }
+
 
 //upvalue --- [1]:setters, [2]:csnewindexer, [3]:base, [4]:newindexfuncs, [5]:arrayindexer, [6]:basenewindex
 //param   --- [1]: obj, [2]: key, [3]: value

@@ -852,6 +852,7 @@ namespace XLua
             try
             {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                // 查找Lua下Type的表(GetTypeId还包含了代码动态生成,类的注册)
                 string className = LuaAPI.lua_tostring(L, 1);
                 Type type = translator.FindType(className);
                 if (type != null)
