@@ -423,6 +423,7 @@ namespace XLua
 					fieldName = "&" + fieldName;
 				}
 
+				// 判断条件 ???
 				if (field.IsStatic && (field.IsInitOnly || field.IsLiteral))
 				{
 					LuaAPI.xlua_pushasciistring(L, fieldName);

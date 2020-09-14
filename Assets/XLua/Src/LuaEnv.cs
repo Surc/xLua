@@ -494,7 +494,7 @@ namespace XLua
                 local fqn = rawget(self,'.fqn')
                 --≥¢ ‘≤È—ØCS¿‡–Õ
                 fqn = ((fqn and fqn .. '.') or '') .. key
-                print('use import_type'..fqn)
+                --print('use import_type'..fqn)
                 local obj = import_type(fqn)
 
                 if obj == nil then

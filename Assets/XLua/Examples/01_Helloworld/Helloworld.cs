@@ -20,8 +20,8 @@ namespace XLuaTest
         void Start()
         {
             LuaEnv luaenv = new LuaEnv();
-            //luaenv.DoString(" CS.UnityEngine.Debug.Log('hello world')");
-            luaenv.DoString("local dataV = CS.UnityEngine.Vector3(5,6,7); local dataV = CS.UnityEngine.Vector3(1,2,3)");
+            luaenv.DoString(" CS.UnityEngine.Debug.Log('hello world')");
+            //luaenv.DoString("local dataV = CS.UnityEngine.Vector3(5,6,7); local dataV = CS.UnityEngine.Vector3(1,2,3)");
          
             //luaenv.DoString("local dataV = CS.UnityEngine.Vector3(5,6,7); dataV:Normalize();CS.UnityEngine.Debug.Log('hello world')");
             luaenv.Dispose();

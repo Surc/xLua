@@ -1,0 +1,7 @@
+E:\GitHub\XLuaLearn\xLua\General\Tools\XLuaHotfixInject.exe
+E:\GitHub\XLuaLearn\xLua\General\Tools\XLuaHotfixInject.pdb
+E:\GitHub\XLuaLearn\xLua\General\vs2013\obj\Any CPU\Debug\XLuaHotfixInject\XLuaHotfixInject.csproj.CoreCompileInputs.cache
+E:\GitHub\XLuaLearn\xLua\General\vs2013\obj\Any CPU\Debug\XLuaHotfixInject\XLuaHotfixInject.csproj.CopyComplete
+E:\GitHub\XLuaLearn\xLua\General\vs2013\obj\Any CPU\Debug\XLuaHotfixInject\XLuaHotfixInject.exe
+E:\GitHub\XLuaLearn\xLua\General\vs2013\obj\Any CPU\Debug\XLuaHotfixInject\XLuaHotfixInject.pdb
+E:\GitHub\XLuaLearn\xLua\General\vs2013\obj\Any CPU\Debug\XLuaHotfixInject\XLuaHotfixInject.csprojAssemblyReference.cache

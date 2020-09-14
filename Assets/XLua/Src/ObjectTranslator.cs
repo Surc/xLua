@@ -1431,6 +1431,7 @@ namespace XLua
             return fix_cs_functions[index];
         }
 
+        // 反射生成的函数存放于此
         internal void PushFixCSFunction(RealStatePtr L, LuaCSFunction func)
         {
             if (func == null)

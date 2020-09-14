@@ -37,8 +37,11 @@ namespace XLua
             ToStringMeta = new LuaCSFunction(StaticLuaCallbacks.ToString);
             EnumAndMeta = new LuaCSFunction(EnumAnd);
             EnumOrMeta = new LuaCSFunction(EnumOr);
+
             StaticCSFunctionWraper = new LuaCSFunction(StaticLuaCallbacks.StaticCSFunction);
+
             FixCSFunctionWraper = new LuaCSFunction(StaticLuaCallbacks.FixCSFunction);
+
             DelegateCtor = new LuaCSFunction(DelegateConstructor);
         }
 

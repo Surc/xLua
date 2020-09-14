@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartArguments>"E:/GitHub/XLuaLearn/xLua/Library/ScriptAssemblies\Assembly-CSharp.dll" "E:\GitHub\XLuaLearn\xLua\Library\ScriptAssemblies\Assembly-CSharp.dll" "E:/GitHub/XLuaLearn/xLua/Assets/XLua/Gen/Resources/hotfix_id_map.lua.txt" "E:/GitHub/XLuaLearn/xLua/Assets/XLua/Gen/hotfix_cfg_in_editor.data"</StartArguments>
+  </PropertyGroup>
+</Project>
