@@ -4,7 +4,6 @@ using UnityEngine;
 using XLua;
 
 
-[LuaCallCSharp]
 public class TestAsClass
 {
     public string x;
@@ -22,6 +21,23 @@ public class TestAsClass
 
 }
 
+
+[GCOptimize()]
+public class TestAsPT
+{
+    public int x;
+    public int y;
+
+    public TestAsPT()
+    {
+  
+    }
+
+    public void Test1()
+    {
+    }
+
+}
 
 [LuaCallCSharp]
 public class TestAslstClass

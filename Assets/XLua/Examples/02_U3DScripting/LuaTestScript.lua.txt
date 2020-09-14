@@ -23,8 +23,8 @@ function update()
 	--self.transform:Rotate(r)
 	--lightCpnt.color = CS.UnityEngine.Color(CS.UnityEngine.Mathf.Sin(CS.UnityEngine.Time.time) / 2 + 0.5, 0, 0, 1)
 	--lightCpnt.color = {r=1, g=1, b=1, a=1};
-	--dataAsU = CS.XLuaTest.PushAsUStruct(1,2, 333.33);
-	--dataAsU = CS.XLuaTest.PushAsUStruct(1,2, 333.33);
+	dataAsU = CS.XLuaTest.PushAsUStruct(1,2, 333.33);
+	dataAsU = CS.XLuaTest.PushAsUStruct(1,2, 333.33);
 	--dataV3 = CS.UnityEngine.Vector3(5,6, 7);
 	--dataV3 = CS.XLuaTest.PushAsClass('test', 1);
 end

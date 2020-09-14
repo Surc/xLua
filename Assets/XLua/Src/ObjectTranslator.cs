@@ -1047,7 +1047,7 @@ namespace XLua
             }
         }
 
-        internal int getTypeId(RealStatePtr L, Type type, out bool is_first, LOGLEVEL log_level = LOGLEVEL.WARN)
+        internal int  getTypeId(RealStatePtr L, Type type, out bool is_first, LOGLEVEL log_level = LOGLEVEL.WARN)
         {
             //尝试获取c#中检索
             int type_id;

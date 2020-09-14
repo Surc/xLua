@@ -12,9 +12,9 @@ local dataV3 = nil;
 --local dataV = CS.UnityEngine.Vector3(5,6,7);
 --dataV:Normalize();
 
-local Dictionary_String_Vector3 = CS.System.Collections.Generic.Dictionary(CS.System.String, CS.UnityEngine.Vector3)
-local dic = Dictionary_String_Vector3()
-dic:Add('a', CS.UnityEngine.Vector3(1, 2, 3))
+--local Dictionary_String_Vector3 = CS.System.Collections.Generic.Dictionary(CS.System.String, CS.UnityEngine.Vector3)
+--local dic = Dictionary_String_Vector3()
+--dic:Add('a', CS.UnityEngine.Vector3(1, 2, 3))
 print(dic:TryGetValue('a'))
 
 --local dataV1 = CS.UnityEngine.Vector3(1,2,3);

@@ -26,7 +26,32 @@ namespace XLuaTest
     {
         public int x;
         public int y;
-        public float f;
+        public float f1;
+
+        public PushAsUStruct(int a, int b, float c)
+        {
+            x = a;
+            y = b;
+            f1 = c;
+        }
+
+        public int GetX()
+        {
+            return x;
+        }
+    }
+
+    public class PushTest
+    {
+        public int a;
+        public int b;
+        public PushAsUStruct strTest;
+        public PushTest(int a, int b, PushAsUStruct c)
+        {
+            this.a = a;
+            this.b = b;
+            strTest = c;
+        }
     }
 
     [GCOptimize(OptimizeFlag.PackAsTable)]
@@ -53,6 +78,8 @@ namespace XLuaTest
         private Action luaOnDestroy;
 
         private LuaTable scriptEnv;
+
+        private Vector3 vec1 = new Vector3(1,3,3);
 
         void Awake()
         {
